@@ -98,7 +98,8 @@ struct Box
     {
         m_Pos = m_Target = start;
         m_CellSize = cellSize;
-        m_Moving = false;
+        //m_Moving = false;
+        m_Moving = true;
         m_World = Matrix::CreateScale(m_CellSize, 1.0f, m_CellSize) * Matrix::CreateTranslation(m_Pos);
     }
 
@@ -839,7 +840,9 @@ struct App
                 );
 
                 // 1단계: 즉시 위치 이동 (텔레포트)
-                it->second.Init(pos, m_CellSize);
+                //it->second.Init(pos, m_CellSize);
+                // 2단계 : 업데이트로 바꿔야 하는데...
+                it->second.SetTarget(pos);
             }
         }
     }
@@ -931,6 +934,11 @@ struct App
     void Update(float dt)
     {
         ProcessNetwork();
+
+        for (auto& [id, box] : m_Boxes)
+        {
+            box.Update(dt);
+        }
     }
 
 

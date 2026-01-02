@@ -214,25 +214,15 @@ private:
         // =========================
         else if (cmd == "DESPAWN")
         {
-            //int x, z;
-            //iss >> x >> z;
-
             auto it = g_Blocks.find(m_SessionKey);
             if (it == g_Blocks.end())
-                return; // ¾ÆÁ÷ SPAWN ¾È µÊ
-
-            //it->second.x = x;
-            //it->second.z = z;
+                return;
 
             std::cout << "[DESPAWN] key=" << m_SessionKey << "\n";
-                //<< " (" << x << "," << z << ")\n";
 
             Broadcast(
                 "DESPAWN " +
                 std::to_string(m_SessionKey) + "\n");
-                //std::to_string(m_SessionKey) + " " +
-                //std::to_string(x) + " " +
-                //std::to_string(z) + "\n");
         }
 
 

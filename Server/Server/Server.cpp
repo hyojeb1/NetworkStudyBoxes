@@ -297,7 +297,8 @@ int main()
     try
     {
         boost::asio::io_context io;
-        tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 8080));
+        //tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 8080));
+        tcp::acceptor acceptor(io, tcp::endpoint(boost::asio::ip::make_address("172.21.1.35"), 8080));//¿Â
 
         std::cout << "Server started on port 8080\n";
         DoAccept(acceptor);

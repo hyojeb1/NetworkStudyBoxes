@@ -105,7 +105,7 @@ struct Box
 
     void SetTarget(const Vector3& target)
     {
-        if (m_Moving) return;
+        //if (m_Moving) return;
         Vector3 delta = target - m_Pos;
         if (delta.Length() < 1e-4f) return;
         m_Target = target;
@@ -311,7 +311,9 @@ struct App
         // Network (Asio)
         // -------------------------------------------------
         m_IO = std::make_unique<boost::asio::io_context>();
-        m_Client = std::make_shared<AsyncClient>(*m_IO, "127.0.0.1", 8080);
+        //m_Client = std::make_shared<AsyncClient>(*m_IO, "127.0.0.1", 8080); //로컬
+        //m_Client = std::make_shared<AsyncClient>(*m_IO, "172.21.1.29", 8080);//황
+        m_Client = std::make_shared<AsyncClient>(*m_IO, "172.21.1.35", 8080);//장
         m_Client->Start();
 
         m_NetThread = std::thread([this]()

@@ -97,7 +97,37 @@ private:
             {
                 if (ec)
                 {
+
+                    //여기서 ec를 이용해서 string을 개조하는 거임. 어떤데
+                    //응~ 소멸자에서 부르는 게 더 깔끔해~
                     std::cout << "[DISCONNECT] sessionKey=" << m_SessionKey << "\n";
+
+                    //
+                    auto it = g_Blocks.find(m_SessionKey);
+
+                    //std::cout << "g_Blocks.size(): " << g_Blocks.size() << std::endl;
+
+                    if (it != g_Blocks.end())
+                    {
+                        //
+                        std::string despawnMsg =
+                            "DESPAWN " +
+                            std::to_string(m_SessionKey) + "\n";
+                            //std::to_string(m_SessionKey) + " " +
+                            //std::to_string(it->second.x) + " " +
+                            //std::to_string(it->second.z) + "\n";
+                        
+                        Broadcast(despawnMsg);
+
+                        g_Blocks.erase(it);
+                    }
+
+                    auto sessionIt = std::find(g_Sessions.begin(), g_Sessions.end(), self);
+                    if (sessionIt != g_Sessions.end())
+                    {
+                        g_Sessions.erase(sessionIt);
+                    }
+                    
                     return;
                 }
 
@@ -177,6 +207,36 @@ private:
                 std::to_string(x) + " " +
                 std::to_string(z) + "\n");
         }
+
+        // =========================
+        // DESPAWN <cellX> <cellZ>
+        // 끊어지는 코드는 서버에서 인식을 하는 게 맞는 것 같은데...
+        // =========================
+        else if (cmd == "DESPAWN")
+        {
+            //int x, z;
+            //iss >> x >> z;
+
+            auto it = g_Blocks.find(m_SessionKey);
+            if (it == g_Blocks.end())
+                return; // 아직 SPAWN 안 됨
+
+            //it->second.x = x;
+            //it->second.z = z;
+
+            std::cout << "[DESPAWN] key=" << m_SessionKey << "\n";
+                //<< " (" << x << "," << z << ")\n";
+
+            Broadcast(
+                "DESPAWN " +
+                std::to_string(m_SessionKey) + "\n");
+                //std::to_string(m_SessionKey) + " " +
+                //std::to_string(x) + " " +
+                //std::to_string(z) + "\n");
+        }
+
+
+
     }
 
     // -------------------------
@@ -198,6 +258,8 @@ private:
                     DoWrite();
             });
     }
+
+    const int getSessionKey() const { return m_SessionKey; };
 
 private:
     tcp::socket m_Socket;
@@ -227,7 +289,8 @@ void DoAccept(tcp::acceptor& acceptor)
         {
             if (!ec)
             {
-                std::cout << "[CONNECT]\n";
+                // g_NextSessionKey이 m_SessionKey인진 잘 모르겠다. 많은 세션중에 일부인데.
+                std::cout << "[CONNECT] sessionKey=" << g_NextSessionKey << "\n";
                 auto session = std::make_shared<Session>(std::move(socket));
                 g_Sessions.push_back(session);
                 session->Start();

@@ -216,6 +216,8 @@ struct App
 
     ~App()
     {
+        SendDespawnRequestToServer();
+
         if (m_IO)
             m_IO->stop();
 
@@ -800,6 +802,25 @@ struct App
             }
 
             // ---------------------------------
+            // DESPAWN <sessionKey> <cellX> <cellZ>
+            // ---------------------------------
+            else if (cmd == "DESPAWN")
+            {
+                int key, x, z;
+                iss >> key >> x >> z;
+
+                Vector3 pos(
+                    (x + 0.5f) * m_CellSize,
+                    0.0f,
+                    (z + 0.5f) * m_CellSize
+                );
+
+                // 왜 안지워지지?
+                // 왜 안생기지라는 표현이 맞긴 하겠네
+                m_Boxes.erase(key);
+            }
+
+            // ---------------------------------
             // MOVE <sessionKey> <cellX> <cellZ>
             // ---------------------------------
             else if (cmd == "MOVE")
@@ -930,6 +951,16 @@ struct App
             "SPAWN " +
             std::to_string(cellX) + " " +
             std::to_string(cellZ) + "\n";
+
+        m_Client->Send(msg);
+    }
+
+  
+    void SendDespawnRequestToServer() const
+    {
+
+        std::string msg =
+            "DESPAWN \n";
 
         m_Client->Send(msg);
     }
@@ -1140,7 +1171,9 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int nCmdShow)
 
             app.UpdateAndDraw(deltaTime);
 
-            app.ProcessNetwork();
+            // 왜 ProcessNetwork()를 두번 하지?
+            // 필요없었다능;;
+            //app.ProcessNetwork();
         }
     }
     return 0;
